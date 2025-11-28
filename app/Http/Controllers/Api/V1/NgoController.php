@@ -6,20 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\RegisterNgoRequest;
 use App\Services\Bo\V1\RegisterNgoBo;
 use App\Services\V1\NgoService;
+use App\Traits\V1\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 
 class NgoController extends Controller
 {
+    Use ApiResponseTrait;
+
     public function registerNgo(RegisterNgoRequest $registerNgoRequest): JsonResponse
     {
         // Get validated data (this ALWAYS works for JSON)
         $data = $registerNgoRequest->validated();
-        // dd($data); // ← ADD THIS
-        $registerNgoBo = app(RegisterNgoBo::class);
 
+        $registerNgoBo = app(RegisterNgoBo::class);
         $registerNgoBo->setOrganisationEmail($data['organisation_email']);
         $registerNgoBo->setUserName($data['user_name']);
-        $registerNgoBo->setPassword(md5($data['confirm_password']));   // Still using your method
+        $registerNgoBo->setPassword(md5($data['confirm_password']));
         $registerNgoBo->setOrganisationWebsite($data['organisation_website'] ?? null);
         $registerNgoBo->setOrganisationName($data['organisation_name']);
         $registerNgoBo->setContactPersonName($data['contact_person_name']);
@@ -35,6 +37,8 @@ class NgoController extends Controller
 
         $ngoService = app(NgoService::class);
 
-        return response()->json($ngoService->registerNgo($registerNgoBo));
+        $data = $ngoService->registerNgo($registerNgoBo);
+
+        return $this->success($data, "NGO registered successfully");
     }
 }
