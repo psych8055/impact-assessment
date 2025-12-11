@@ -20,7 +20,8 @@ class SdgsController extends Controller
             $data = $sdgsService->getSdgsData();
 
             return $this->success($data, "SDGs retrieved successfully");
-        } catch (Exception) {
+        } catch (Exception $e) {
+            dd($e->getMessage());
             return $this->error("Failed to retrieve SDGs");
         }
     }
